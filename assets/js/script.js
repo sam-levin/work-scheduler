@@ -5,18 +5,15 @@ let totalDivs = numHours*numDivisions;
 
 var tasks = {} 
 
-var penisTest = function () {
-    console.log("penis")
-}
-
+// this checks the date and time and displays it at the beginning of the page
 var updatedate = function(){
     let datestamp = moment().format("MM/DD/YY");
     var todaysdate = document.getElementById("currentDay")
     let timestamp = moment().format("h:mm a");
     todaysdate.innerHTML = "Todays date is " + datestamp + " and the time is " + timestamp;
-    // this needs to be updated to include moment.js to display current date
 }
-  
+
+// this checks the time of the task block and change its color
 var timeCheck = function (timeId, taskBlock) {
     if (timeId.isBefore(moment())) {
         taskBlock.addClass("description col-sm-7 past")
@@ -29,6 +26,7 @@ var timeCheck = function (timeId, taskBlock) {
 
 var loadLocalTasks = function () {
     var loadedTasks = JSON.parse(localStorage.getItem("tasks"))
+    // if the loaded tasks returns nothing, it will return an empty object, else it will return the old tasks as an object
     if (!loadedTasks) {
         tasks = {}
         return tasks
@@ -39,17 +37,19 @@ var loadLocalTasks = function () {
     }
 }
 
+// this saves the tasks object as a json string
 var saveToLocalStor = function () {
     localStorage.setItem("tasks",JSON.stringify(tasks))
 }
 
-// currently, when saving, it only saves them once/ when building the blocks it does not re-put them into the tasks object
-var buildblocks = function (){ // need to add functionality to add prexisting tasks
+
+var buildblocks = function (){ 
+    // this loads existing tasks
     var oldTasks = loadLocalTasks()
     for (i = 0; i < numHours; i ++) {
-        var timeEl = moment().startOf('day').add(7 + i,"hour");
-        var unixTimeEl =  moment(timeEl).unix()*1000;
-        var newBlock = $("<li>").addClass("row")
+        var timeEl = moment().startOf('day').add(7 + i,"hour"); // this creates a moment object of the time, starting at 7:00 am of the day and adding i hours 
+        var unixTimeEl =  moment(timeEl).unix()*1000; // this creates a unix number of the timeEl moment object
+        var newBlock = $("<li>").addClass("row") // this creates a new li
         var timeBlock = $("<h4>")
             .addClass("hour col-sm-3")
             .text(timeEl.format('h:mm a'));
@@ -58,14 +58,12 @@ var buildblocks = function (){ // need to add functionality to add prexisting ta
         .text(oldTasks[unixTimeEl])
         timeCheck(timeEl, taskBlock); 
         var newText = taskBlock.textContent
-        tasks.unixTimeEl = newText    
-            // if  statement for if content is before or after time 
-        var saveBlock =$("<span>")
-            .addClass(" oi oi-plus saveBtn col-sm-2")// we need to make this have text align center
-
+        tasks.unixTimeEl = newText    // this sets the tasks object to have new values
+        //this creates a save button
+        var saveBlock =$("<span>") 
+            .addClass(" oi oi-plus saveBtn col-sm-2")
         // append to parent list
         newBlock.append(timeBlock, taskBlock, saveBlock);
-
         // append to ul list on the page
         $(".container").append(newBlock);
     }
@@ -74,14 +72,7 @@ var buildblocks = function (){ // need to add functionality to add prexisting ta
     
 }
 
-
-
-
-
-// there should be a separate function validating blocks with the time 
-    // this also needs to run on an interval system
-
-// task text was clicked
+// when task text was clicked
 $(".container").on("click", "h3", function() {
     // get current text of p element
     loadLocalTasks();
@@ -98,26 +89,10 @@ $(".container").on("click", "h3", function() {
     // there should maybe be something that makes other tasks unclickable 
 });
 
-// right now, it is only saving the new tasks with the text area 
-// we need to have it also save as a h3 object
 var saveTaskToBlock = function () {
     // get current value of textarea
     var text = $("textarea").val();
     var textAreaId = $("textarea").attr("id");
-    // get status type and position in the list
-    /*var status = $(this)
-      .closest(".list-group")
-      .attr("id")
-      .replace("list-", "");
-    var index = $(this)
-      .closest(".list-group-item")
-      .index();
-  
-    // update task in array and re-save to localstorage
-    tasks[status][index].text = text;
-    saveTasks();
-  */
-
     // recreate p element
     var taskP = $("<h3>")
       .addClass("col-sm-7")
@@ -125,6 +100,8 @@ var saveTaskToBlock = function () {
       .attr("id", textAreaId);
     // replace textarea with new content
     $("textarea").replaceWith(taskP);
+
+    // this creates a moment object from the id number to be put back into time check
     var momentObjId = moment.unix(($(taskP).attr("id"))/1000)
     timeCheck(momentObjId,taskP)
 
@@ -138,8 +115,7 @@ var saveTaskToBlock = function () {
     saveToLocalStor();
 }
 
-// either on the click of the save button or clicking somewhere else, the thing block will be saved
-//$(".container").on("blur", "textarea", saveTaskToBlock);
+// by clicking on the save button, the task will be saved
 $(".container").on("click", ".saveBtn",saveTaskToBlock);
 
 updatedate();
@@ -152,5 +128,6 @@ setInterval(function(){
 
 // this checks the time every 15 minutes and changes colors of the blocks
 setInterval(function(){
-    
+    buildblocks();
+    console.log("penis")
 }, 90000)
