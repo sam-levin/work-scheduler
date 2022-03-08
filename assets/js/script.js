@@ -4,7 +4,9 @@ let minPerDiv = 60/numDivisions;
 let totalDivs = numHours*numDivisions;
 
 
-
+var penisTest = function () {
+    console.log("penis")
+}
 
 var updatedate = function(){
     let datestamp = moment().format("MM/DD/YY");
@@ -69,7 +71,7 @@ $(".container").on("click", "h3", function() {
     // there should maybe be something that makes other tasks unclickable 
 });
 
-$(".container").on("click", ".saveBtn", function() {
+var saveTaskToBlock = function () {
     // get current value of textarea
     var text = $("textarea").val();
     var textAreaId = $("textarea").attr("id")
@@ -96,21 +98,21 @@ $(".container").on("click", ".saveBtn", function() {
     $("textarea").replaceWith(taskP);
     var momentObjId = moment.unix(($(taskP).attr("id"))/1000)
     timeCheck(momentObjId,taskP)
-});
+}
 
-
-// there should be an if statement using moment.js timing to determine if a time block has passed
-    // if the time is passed, change bootstrap to grey
-    // if the time is within 2 hours, change to orange
-    // else, change bootstrap to green
-
+// either on the click of the save button or clicking somewhere else, the thing block will be saved
+$(".container").on("blur", "textarea", saveTaskToBlock);
+$(".container").on("click", ".saveBtn",saveTaskToBlock);
 
 updatedate();
 buildblocks();
 
-
+// this resets the timestamp every minute
 setInterval(function(){
     updatedate();
 }, 6000)
-// there should be a set interval of 6000 seconds for refreshing the timestamp
-// this can also be used to have the blocks interact with the time stamp here
+
+// this checks the time every 15 minutes and changes colors of the blocks
+setInterval(function(){
+    
+}, 90000)
