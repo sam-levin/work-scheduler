@@ -129,5 +129,4 @@ setInterval(function(){
 // this checks the time every 15 minutes and changes colors of the blocks
 setInterval(function(){
     buildblocks();
-    console.log("penis")
 }, 90000)
