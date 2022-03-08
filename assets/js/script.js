@@ -31,6 +31,7 @@ var loadLocalTasks = function () {
     var loadedTasks = JSON.parse(localStorage.getItem("tasks"))
     if (!loadedTasks) {
         tasks = {}
+        return tasks
     } else {
         tasks = loadedTasks
         saveToLocalStor();
@@ -69,7 +70,6 @@ var buildblocks = function (){ // need to add functionality to add prexisting ta
         $(".container").append(newBlock);
     }
     saveToLocalStor();
-    console.log(tasks)
 
     
 }
