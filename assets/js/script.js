@@ -1,48 +1,46 @@
-let numHours = 12;
-let numDivisions = 1;
+let numHours = 18;
+let numDivisions = 2;
 let minPerDiv = 60/numDivisions;
 let totalDivs = numHours*numDivisions;
+
 
 
 
 var updatedate = function(){
     let datestamp = moment().format("MM/DD/YY");
     var todaysdate = document.getElementById("currentDay")
-    let timestamp = moment().format("HH:mm");
+    let timestamp = moment().format("h:mm a");
     todaysdate.innerHTML = "Todays date is " + datestamp + " and the time is " + timestamp;
     // this needs to be updated to include moment.js to display current date
 }
-
-var createBlock = function(taskText, taskDate, taskList) {
-    // create elements that make up a task item
-    var taskLi = $("<li>").addClass("list-group-item");
-    var taskSpan = $("<span>")
-      .addClass("badge badge-primary badge-pill")
-      .text(taskDate);
-    var taskP = $("<p>")
-      .addClass("m-1")
-      .text(taskText);
   
-    // append span and p element to parent li
-    taskLi.append(taskSpan, taskP);
-    auditTask(taskLi)
-  
-    // append to ul list on the page
-    $("#list-" + taskList).append(taskLi);
-  };
+var timeCheck = function (timeId, taskBlock) {
+    if (timeId.isBefore(moment())) {
+        taskBlock.addClass(" description col-sm-7")
+        taskBlock.addClass("past")
+    } else if (((moment(timeId).diff(moment()))/3600000)< 1 && ((moment(timeId).diff(moment()))/3600000) > 0) {
+        taskBlock.addClass("present")
+        taskBlock.addClass(" description col-sm-7")
 
+    } else {
+        taskBlock.addClass("future");
+        taskBlock.addClass(" description col-sm-7")
+    }
+};
 
 var buildblocks = function (){
-    for (i = 0; i < totalDivs; i ++) {
+    for (i = 0; i < numHours; i ++) {
+        var timeEl = moment().startOf('day').add(7 + i,"hour");
         var newBlock = $("<li>").addClass("row")
-        var time = i
         var timeBlock = $("<h4>")
-            .addClass("block-item col-sm-3")
-            .text(time);
+            .addClass("  hour col-sm-3")
+            .text(timeEl.format('h:mm a'));
         var taskBlock = $("<h3>")
-            .addClass("block-item editable col-sm-7")
+            $(taskBlock).attr("id", timeEl)
+            timeCheck(timeEl, taskBlock);
+            // if  statement for if content is before or after time 
         var saveBlock =$("<span>")
-            .addClass("block-item oi oi-plus plus-button col-sm-2")// we need to make this have text align center
+            .addClass(" oi oi-plus saveBtn col-sm-2")// we need to make this have text align center
 
         // append to parent list
         newBlock.append(timeBlock, taskBlock, saveBlock);
@@ -52,25 +50,29 @@ var buildblocks = function (){
     }
 }
 
+// there should be a separate function validating blocks with the time 
+    // this also needs to run on an interval system
+
 // task text was clicked
 $(".container").on("click", "h3", function() {
     // get current text of p element
     var text = $(this)
       .text()
       .trim();
-  
+    var currentId = $(this).attr("id")
     // replace p element with a new textarea
     var textInput = $("<textarea>").addClass("form-control col-sm-7").val(text);
     $(this).replaceWith(textInput);
-  
+    $(textInput).attr("id", currentId)
     // auto focus new element
     textInput.trigger("focus");
+    // there should maybe be something that makes other tasks unclickable 
 });
 
-$(".container").on("click", ".plus-button", function() {
+$(".container").on("click", ".saveBtn", function() {
     // get current value of textarea
     var text = $("textarea").val();
-  
+    var textAreaId = $("textarea").attr("id")
     // get status type and position in the list
     /*var status = $(this)
       .closest(".list-group")
@@ -88,10 +90,12 @@ $(".container").on("click", ".plus-button", function() {
     // recreate p element
     var taskP = $("<h3>")
       .addClass("col-sm-7")
-      .text(text);
-  
+      .text(text)
+      .attr("id", textAreaId);
     // replace textarea with new content
     $("textarea").replaceWith(taskP);
+    var momentObjId = moment.unix(($(taskP).attr("id"))/1000)
+    timeCheck(momentObjId,taskP)
 });
 
 
